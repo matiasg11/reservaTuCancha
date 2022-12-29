@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { graphqlHTTP } = require('express-graphql'); //Middleware function that we call later
 const { buildSchema } = require('graphql');
+const mongoose = require('mongoose')
 
 const app = express();
 
