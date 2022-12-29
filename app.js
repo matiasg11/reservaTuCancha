@@ -67,6 +67,11 @@ app.get('/', (req,res,next)=>{
     res.send(`Listening on port...${PORT}`)
 })
 
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@rtc.mhdv1hi.mongodb.net/test`)
+    .then().catch(err=>{
+        console.log(err)
+});
+
 let PORT = 3000
 app.listen(PORT);
  
