@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const { graphqlHTTP } = require('express-graphql'); //Middleware function that we call later
 const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 
 const app = express();
 
@@ -82,10 +82,17 @@ app.use('/graphql', graphqlHTTP({
 
 
         createUser: args => {
-            const user = newUser({
-                email: args.userInput.email,
-                password: args.userInput.Password
+        bcrypt
+            .hash(args.userInput.password, 12)
+            .then(hashPass =>{
+                const user = newUser({
+                    email: args.userInput.email,
+                    password: hashPass
+                });
             })
+            .catch(err =>{
+            throw err;
+            });
         }
     },
     graphiql: true
