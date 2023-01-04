@@ -2,7 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { graphqlHTTP } = require('express-graphql'); //Middleware function that we call later
 const { buildSchema } = require('graphql');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt')
 
 const app = express();
 
@@ -20,11 +21,22 @@ app.use('/graphql', graphqlHTTP({
             date: String!
         }
 
+        type user {
+            _id: ID!
+            email: String!
+            password: String
+        }
+
         input EventInput{
             title: String!
             description: String!
             price: Float!
             date: String!
+        }
+
+        input UserInput{
+            email: String!
+            password: String!
         }
 
         type RootQuery{
@@ -33,6 +45,7 @@ app.use('/graphql', graphqlHTTP({
 
         type RootMutation{
             createEvent(eventInput: EventInput): Event
+            createUser(userInput: UserInput): User
         }
 
         schema {
@@ -56,6 +69,23 @@ app.use('/graphql', graphqlHTTP({
             }
             events.push(event)
             return event
+                .save()
+                .then(result => {
+                    console.log(result);
+                    return {...result._doc, _id: result._doc._id.toString()};
+                })
+                .catch(er =>{
+                    console.log(err);
+                    throw err;
+                });
+        },
+
+
+        createUser: args => {
+            const user = newUser({
+                email: args.userInput.email,
+                password: args.userInput.Password
+            })
         }
     },
     graphiql: true
