@@ -93,7 +93,7 @@ app.use('/graphql', graphqlHTTP({
                    
                 })
                 .then(user =>{
-                    if (user){
+                    if (!user){
                         throw new Error('User does not exist')
                    }
                    user.createdEvents.push(event);
