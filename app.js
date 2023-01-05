@@ -5,9 +5,10 @@ const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs')
 
-const app = express();
+const Event = require('./models/event.js')
 
-const events = [];
+
+const app = express();
 
 app.use(bodyParser.json())
 
@@ -60,21 +61,27 @@ app.use('/graphql', graphqlHTTP({
         },
 
         createEvent: (args) => {
-            const event = {
-                _id: Math.random().toString(),
+            // const event = {
+            //     _id: Math.random().toString(),
+            //     title: args.eventInput.title,
+            //     description: args.eventInput.description,
+            //     price: +args.eventInput.price, 
+            //     date: args.eventInput.date
+            // }
+
+            const event = new Event({
                 title: args.eventInput.title,
                 description: args.eventInput.description,
                 price: +args.eventInput.price, 
-                date: args.eventInput.date
-            }
-            events.push(event)
+                date: new Date (args.eventInput.date)
+            })
             return event
                 .save()
                 .then(result => {
                     console.log(result);
                     return {...result._doc, _id: result._doc._id.toString()};
                 })
-                .catch(er =>{
+                .catch(err =>{
                     console.log(err);
                     throw err;
                 });
@@ -108,7 +115,9 @@ app.get('/', (req,res,next)=>{
     res.send(`Listening on port...${PORT}`)
 })
 
-mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@rtc.mhdv1hi.mongodb.net/test`)
+mongoose
+    .connect(
+        `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@rtc.mhdv1hi.mongodb.net/${process.env.MONGO_DB}`)
     .then().catch(err=>{
         console.log(err)
 });
