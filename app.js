@@ -21,7 +21,7 @@ app.use('/graphql', graphqlHTTP({
             date: String!
         }
 
-        type user {
+        type User {
             _id: ID!
             email: String!
             password: String
@@ -82,13 +82,17 @@ app.use('/graphql', graphqlHTTP({
 
 
         createUser: args => {
-        bcrypt
+        return bcrypt
             .hash(args.userInput.password, 12)
             .then(hashPass =>{
-                const user = newUser({
+                const user = new User({
                     email: args.userInput.email,
                     password: hashPass
                 });
+                return user.save();
+            })
+            .then(result => {
+                return { ...result._doc, _id: result.id};
             })
             .catch(err =>{
             throw err;
