@@ -57,7 +57,13 @@ app.use('/graphql', graphqlHTTP({
     //Has all the resolver functions. Need to match the schema endpoints by name
     rootValue: {
         events: () =>{
-            return events;
+            return Event.find()
+                .then(events => {
+                    return events.map(event => {
+                        return {...event._doc, _id: event._doc._id.toString()}
+                    })
+                })
+                .catch(err => {throw err})
         },
 
         createEvent: (args) => {
