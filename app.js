@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs')
 
 const Event = require('./models/event.js')
+const User = require('./models/user.js')
 
 
 const app = express();
@@ -95,21 +96,25 @@ app.use('/graphql', graphqlHTTP({
 
 
         createUser: args => {
-        return bcrypt
-            .hash(args.userInput.password, 12)
-            .then(hashPass =>{
-                const user = new User({
-                    email: args.userInput.email,
-                    password: hashPass
+        return User.findOne({email:args.userInput.email})
+            .then(user =>{ 
+                 if (user){
+                      throw new Error('User exists already')
+                 }
+                 return bcrypt.hash(args.userInput.password, 12)})
+                .then(hashPass =>{
+                    const user = new User({
+                        email: args.userInput.email,
+                        password: hashPass
+                    });
+                    return user.save();
+                })
+                .then(result => {
+                    return { ...result._doc, password:null, _id: result.id};
+                })
+                .catch(err =>{
+                throw err;
                 });
-                return user.save();
-            })
-            .then(result => {
-                return { ...result._doc, _id: result.id};
-            })
-            .catch(err =>{
-            throw err;
-            });
         }
     },
     graphiql: true
