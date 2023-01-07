@@ -11,7 +11,8 @@ const events = eventIds =>{
                 return {
                     ...event._doc,
                     _id: event.id,
-                    creator: user.bind(this, event.creator)
+                    date:  new Date(even._doc.date).toISOString(),
+                    creator: user.bind(this, event.creator),
                 }
             })
         })
@@ -42,6 +43,7 @@ module.exports = {
                 return events.map(event => {
                     return {...event._doc,
                              _id: event._doc._id.toString(),
+                             date:  new Date(even._doc.date).toISOString(),
                             creator: user.bind(this, event._doc.creator) 
                         }
                 })
