@@ -54,7 +54,7 @@ module.exports = {
             }
     },
 
-    createEvent: (args) => {
+    createEvent: async (args) => {
         // const event = {
         //     _id: Math.random().toString(),
         //     title: args.eventInput.title,
@@ -71,30 +71,27 @@ module.exports = {
             creator: '63b748d157864be987e14092'
         })
         let createdEvent
-        return event
+        try{
+        const result = await event
             .save()
-            .then(result => {
-                createdEvent = {...result._doc, 
-                                _id: result._doc._id.toString(),
-                                creator: user.bind(this, result._doc.creator)};
-                return User.findById('63b748d157864be987e14092')
-                console.log(result);
-               
-            })
-            .then(user =>{
-                if (!user){
-                    throw new Error('User does not exist')
-               }
-               user.createdEvents.push(event);
-               return user.save()
-            })
-            .then(result => {
-                return createdEvent
-            })
-            .catch(err =>{
+            createdEvent = {
+                ...result._doc, 
+                _id: result._doc._id.toString(),
+                date: new Date (args.eventInput.date),
+                creator: user.bind(this, result._doc.creator)
+            };
+            const u = await User.findById('63b748d157864be987e14092') 
+            if (!u){
+                throw new Error('User does not exist')
+            }
+            u.createdEvents.push(event);
+            await user.save()
+            return createdEvent
+        }
+            catch(err) {
                 console.log(err);
                 throw err;
-            });
+            };
     },
 
 
