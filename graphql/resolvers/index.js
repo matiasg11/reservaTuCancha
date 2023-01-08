@@ -4,21 +4,20 @@ const Event = require('../../models/event.js')
 const User = require('../../models/user.js')
 
 
-const events = eventIds =>{
-    return Event.find({ _id: {$in: eventIds}})
-        .then(events => {
-            return events.map(event =>{
+const events = async eventIds => {
+    try{
+        const events = await Event.find({ _id: {$in: eventIds}})
+          events.map(event =>{
                 return {
                     ...event._doc,
                     _id: event.id,
                     date:  new Date(even._doc.date).toISOString(),
                     creator: user.bind(this, event.creator),
-                }
-            })
-        })
-        .catch(err =>{
+                };
+            });
+        } catch(err) {
             throw err;
-        })
+        }
 }
 
 
