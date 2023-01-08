@@ -72,8 +72,7 @@ module.exports = {
         })
         let createdEvent
         try{
-        const result = await event
-            .save()
+        const result = await event.save()
             createdEvent = {
                 ...result._doc, 
                 _id: result._doc._id.toString(),
@@ -85,7 +84,7 @@ module.exports = {
                 throw new Error('User does not exist')
             }
             u.createdEvents.push(event);
-            await user.save()
+            await u.save()
             return createdEvent
         }
             catch(err) {
