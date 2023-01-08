@@ -95,25 +95,22 @@ module.exports = {
     },
 
 
-    createUser: args => {
-    return User.findOne({email:args.userInput.email})
-        .then(user =>{ 
-             if (user){
-                  throw new Error('User exists already')
-             }
-             return bcrypt.hash(args.userInput.password, 12)})
-            .then(hashPass =>{
+    createUser: async (args) => {
+        try{
+        const existingUser = await User.findOne({email:args.userInput.email});
+                if (existingUser){
+                    throw new Error('User exists already');
+                }
+                const hashPass = await  bcrypt.hash(args.userInput.password, 12);
                 const user = new User({
-                    email: args.userInput.email,
-                    password: hashPass
-                });
-                return user.save();
-            })
-            .then(result => {
+                        email: args.userInput.email,
+                        password: hashPass
+                    });
+                const result = await user.save();
                 return { ...result._doc, password:null, _id: result.id};
-            })
-            .catch(err =>{
+        }
+        catch(err) {
             throw err;
-            });
+        }
     }
 }
