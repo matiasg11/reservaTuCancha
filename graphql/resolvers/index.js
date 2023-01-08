@@ -37,19 +37,21 @@ const user = async userId => {
 }
 
 module.exports = {
-    events: () =>{
-        return Event.find()
-            .populate('creator')
-            .then(events => {
-                return events.map(event => {
+    events: async () => {
+        try {
+        const events = await Event.find()
+            return events
+                .map(event => {
                     return {...event._doc,
                              _id: event._doc._id.toString(),
                              date:  new Date(even._doc.date).toISOString(),
                             creator: user.bind(this, event._doc.creator) 
                         }
                 })
-            })
-            .catch(err => {throw err})
+            }
+            catch(err) {
+                throw err
+            }
     },
 
     createEvent: (args) => {
