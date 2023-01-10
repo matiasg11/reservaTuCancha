@@ -4,19 +4,23 @@ const Event = require('../../models/event.js')
 const User = require('../../models/user.js')
 const Booking = require('../../models/booking.js')
 
+const transformEvent = event => { 
+    return {
+        ...event._doc,
+        _id: event.id,
+        date:  new Date(even._doc.date).toISOString(),
+        creator: user.bind(this, event.creator),
+    }
+}
 
 const events = async eventIds => {
     try{
         const events = await Event.find({ _id: {$in: eventIds}})
-          events.map(event =>{
-                return {
-                    ...event._doc,
-                    _id: event.id,
-                    date:  new Date(even._doc.date).toISOString(),
-                    creator: user.bind(this, event.creator),
-                };
+          return events.map(event =>{
+                return transformEvent(event)
+                ;
             });
-            // return events
+           
         } catch(err) {
             throw err;
         }
@@ -24,10 +28,7 @@ const events = async eventIds => {
 const singleEvent = async eventId =>{
     try{
         const event = await Event.findById(eventId);
-        return { 
-            ...event._doc,
-            _id: event.id,
-            creator:user.bind(this, event.creator)}
+        return transformEvent(event)
     }
     catch{
         throw err
@@ -55,11 +56,7 @@ module.exports = {
         const events = await Event.find()
             return events
                 .map(event => {
-                    return {...event._doc,
-                             _id: event._doc._id.toString(),
-                             date:  new Date(even._doc.date).toISOString(),
-                            creator: user.bind(this, event._doc.creator) 
-                        }
+                    return transformEvent(event)
                 })
             }
             catch(err) {
@@ -104,12 +101,7 @@ module.exports = {
         let createdEvent
         try{
         const result = await event.save()
-            createdEvent = {
-                ...result._doc, 
-                _id: result._doc._id.toString(),
-                date: new Date (args.eventInput.date),
-                creator: user.bind(this, result._doc.creator)
-            };
+            createdEvent = transformEvent(result)
             const u = await User.findById('63b748d157864be987e14092') 
             if (!u){
                 throw new Error('User does not exist')
