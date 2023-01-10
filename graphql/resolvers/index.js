@@ -8,7 +8,7 @@ const transformEvent = event => {
     return {
         ...event._doc,
         _id: event.id,
-        date:  new Date(even._doc.date).toISOString(),
+        date:  new Date(event._doc.date).toISOString(),
         creator: user.bind(this, event.creator),
     }
 }
@@ -96,13 +96,13 @@ module.exports = {
             description: args.eventInput.description,
             price: +args.eventInput.price, 
             date: new Date (args.eventInput.date),
-            creator: '63b748d157864be987e14092'
+            creator: '63bde22e0a48d566408d052f'
         })
         let createdEvent
         try{
         const result = await event.save()
             createdEvent = transformEvent(result)
-            const u = await User.findById('63b748d157864be987e14092') 
+            const u = await User.findById('63bde22e0a48d566408d052f') 
             if (!u){
                 throw new Error('User does not exist')
             }
@@ -140,7 +140,7 @@ module.exports = {
     bookEvent: async (args) => {
         const fetchedEvent = await Event.findOne({_id: args.eventId});
         const booking = new Booking( {
-            user: "63b748d157864be987e14092",
+            user: "63bde22e0a48d566408d052f",
             event: fetchedEvent
         })
         const result = await booking.save();
@@ -158,10 +158,7 @@ module.exports = {
     cancelBooking: async (args) => {
         try{
              const booking = await Booking.findById(args.bookingId).populate('event')
-            const event = { ...booking.event,
-                            _id: booking.event.id,
-                            creator: user.bind(this, booking.creator)
-                        }
+            const event = transformEvent(booking.event)
 
              await Booking.deleteOne({ _id: args.bookingId})
              return
